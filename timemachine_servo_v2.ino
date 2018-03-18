@@ -31,43 +31,58 @@ void setup() {
 float period(float L) {
   L = L/100.0; //length in m
   P = 2*PI*sqrt(L/9.8);
-  return P*1000/2; //period in ms
+  return P*1000; //period in ms
 }
 
 void loop() {
   //check and see if a data packet has come in. 
-  Serial.println(mydata.lengthID);
   if(ET.receiveData()){
     //this is how you access the variables. [name of the group].[variable name]
     switch (mydata.lengthID) {
       case 0:
-        P = period(9); // cm
+        P = period(7); // cm
         break;
       case 1:
-        P = period(9 + 2.4); // cm
+        P = period(10); // cm
         break;
       case 2:
-        P = period(9 + 2*2.4); // cm
+        P = period(13); // cm
         break;
       case 3:
-        P = period(9 + 3*2.4); // cm
+        P = period(16); // cm
         break;
       case 4:
-        P = period(9 + 4*2.4); // cm
+        P = period(19); // cm
         break;
       case 5:
-        P = period(21); 
+        P = period(22); 
         break;
-    }    
-    Serial.println(mydata.lengthID);
+    }        
+    int diff = 40;
+    for (pos = 90 - diff; pos <= 90 + diff; pos += 1) { // goes from 0 degrees to 180 degrees
+      // in steps of 1 degree
+      myservo.write(pos);              // tell servo to go to position in variable 'pos'
+      delay(P/diff);                       // waits for the servo to reach the position
+    }
+    for (pos = 90 + diff; pos >= 90 - diff; pos -= 1) { // goes from 180 degrees to 0 degrees
+      myservo.write(pos);              // tell servo to go to position in variable 'pos'
+      delay(P/diff);                       // waits for the servo to reach the position
+    }
   }
-  for (pos = 75; pos <= 105; pos += 1) { // goes from 0 degrees to 180 degrees
+  //  myservo.write(90);
+  // read the input on analog pin 0:
+  int sensorValue = analogRead(A0); 
+  // max P is 2000 ms
+  float P = sensorValue * (2000 / 1023.0);
+  Serial.println(sensorValue);
+   
+  for (pos = 30; pos <= 150; pos += 1) { // goes from 0 degrees to 180 degrees
     // in steps of 1 degree
     myservo.write(pos);              // tell servo to go to position in variable 'pos'
-    delay(P/30);                       // waits for the servo to reach the position
+    delay(P/120);                       // waits for the servo to reach the position
   }
-  for (pos = 105; pos >= 75; pos -= 1) { // goes from 180 degrees to 0 degrees
+  for (pos = 150; pos >= 30; pos -= 1) { // goes from 180 degrees to 0 degrees
     myservo.write(pos);              // tell servo to go to position in variable 'pos'
-    delay(P/30);                       // waits for the servo to reach the position
+    delay(P/120);                       // waits for the servo to reach the position
   }
 }
